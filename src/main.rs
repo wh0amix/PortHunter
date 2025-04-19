@@ -52,6 +52,27 @@ fn scan_ports_menu() {
     println!("✅ Scan terminé !");
 }
 
+fn show_port_guide() {
+    let mut guide = HashMap::new();
+    guide.insert(20, "FTP (Data)");
+    guide.insert(21, "FTP (Control)");
+    guide.insert(22, "SSH - Secure Shell");
+    guide.insert(23, "Telnet - Remote Login");
+    guide.insert(25, "SMTP - Email Sending");
+    guide.insert(53, "DNS - Domain Name System");
+    guide.insert(80, "HTTP - Web Traffic");
+    guide.insert(110, "POP3 - Email");
+    guide.insert(143, "IMAP - Email");
+    guide.insert(443, "HTTPS - Secure Web");
+    guide.insert(3306, "MySQL - Database");
+    guide.insert(3389, "RDP - Remote Desktop");
+
+    println!("\n📖 Guide des ports courants :");
+    for (port, description) in guide.iter() {
+        println!("🔹 Port {:<5} → {}", port, description);
+    }
+    println!();
+}
 
 fn main() {
     print_banner();
