@@ -1,4 +1,4 @@
-use std::io::{self, Write};
+use std::io::{self, Write, Read};
 use std::net::{TcpStream, SocketAddr, ToSocketAddrs};
 use std::time::Duration;
 use rayon::prelude::*;
@@ -14,20 +14,30 @@ fn print_banner() {
     }
 }
 
-fn scan_port(ip: &str, port: u16, timeout: Duration) -> bool {
+fn scan_port(ip: &str, port: u16, timeout: Duration) -> Option<String> {
     let addr = format!("{}:{}", ip, port);
     let socket_addrs: Vec<SocketAddr> = match addr.to_socket_addrs() {
         Ok(addrs) => addrs.collect(),
-        Err(_) => return false,
+        Err(_) => return None,
     };
 
     for socket_addr in socket_addrs {
-        if TcpStream::connect_timeout(&socket_addr, timeout).is_ok() {
-            return true;
+        if let Ok(mut stream) = TcpStream::connect_timeout(&socket_addr, timeout) {
+            let _ = stream.set_read_timeout(Some(Duration::from_secs(2)));
+
+            let mut buffer = [0; 512];
+            if let Ok(n) = stream.read(&mut buffer) {
+                if n > 0 {
+                    let banner = String::from_utf8_lossy(&buffer[..n]).to_string();
+                    return Some(banner);
+                }
+            }
+
+            return Some(String::from("Port ouvert, pas de bannière détectée"));
         }
     }
 
-    false
+    None
 }
 
 fn scan_ports_menu() {
@@ -44,9 +54,11 @@ fn scan_ports_menu() {
     println!("🔍 Scan de {} du port {} à {}", ip, start_port, end_port);
 
     (start_port..=end_port).into_par_iter().for_each(|port| {
-        if scan_port(ip, port, timeout) {
+        if let Some(banner) = scan_port(ip, port, timeout) {
             println!("✅ Port {} est ouvert", port);
+            println!("   🏷️  Bannière : {}", banner.trim());
         }
+        
     });
 
     println!("✅ Scan terminé !");
