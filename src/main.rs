@@ -1,7 +1,8 @@
 use std::io::{self, Write, Read};
-use std::net::{TcpStream, SocketAddr, ToSocketAddrs};
+use std::net::{TcpStream, SocketAddr, ToSocketAddrs, IpAddr};
 use std::time::Duration;
 use rayon::prelude::*;
+use dns_lookup::lookup_addr;
 use std::collections::HashMap;
 use figlet_rs::FIGfont;
 
@@ -46,6 +47,23 @@ fn scan_ports_menu() {
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut ip).unwrap();
     let ip = ip.trim();
+    let hostname = match ip.parse::<IpAddr>() {
+        Ok(ip_addr) => match lookup_addr(&ip_addr) {
+            Ok(name) => name,
+            Err(_) => "Non résolu".to_string(),
+        },
+        Err(_) => "Adresse invalide".to_string(),
+    };
+
+    match ip.parse::<IpAddr>() {
+        Ok(ip_addr) => {
+            match lookup_addr(&ip_addr) {
+                Ok(hostname) => println!("🌐 Nom d’hôte résolu : {}", hostname),
+                Err(_) => println!("🌐 Nom d’hôte non trouvé."),
+            }
+        }
+        Err(_) => println!("❌ Adresse IP invalide."),
+    }        
 
     let start_port = 1;
     let end_port = 1024;
@@ -58,8 +76,8 @@ fn scan_ports_menu() {
             println!("✅ Port {} est ouvert", port);
             println!("   🏷️  Bannière : {}", banner.trim());
         }
-        
     });
+    
 
     println!("✅ Scan terminé !");
 }
