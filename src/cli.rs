@@ -86,6 +86,8 @@ pub fn show_port_guide() {
     guide.insert(110, "POP3 - Email");
     guide.insert(143, "IMAP - Email");
     guide.insert(443, "HTTPS - Secure Web");
+    guide.insert(993, "IMAPS - Secure IMAP");
+    guide.insert(995, "POP3S - Secure POP3");
     guide.insert(3306, "MySQL - Database");
     guide.insert(3389, "RDP - Remote Desktop");
 
@@ -118,7 +120,8 @@ pub fn run_cli() {
             "2" => show_port_guide(),
             "3" => {
                 println!("🚀 Lancement de l'interface graphique...");
-                break;
+                // Retourner pour lancer la GUI depuis main()
+                return;
             }
             "0" => {
                 println!("👋 Au revoir !");
@@ -129,61 +132,21 @@ pub fn run_cli() {
     }
 }
 
-// src/main.rs - Version modifiée pour choisir entre CLI et GUI
-use std::env;
+// Tests unitaires pour le module CLI
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-mod cli;
-
-// Import du code GUI de l'artifact précédent
-// [Le code complet de l'interface graphique va ici]
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args: Vec<String> = env::args().collect();
-    
-    // Si --cli est passé en argument, utiliser la version CLI
-    if args.contains(&"--cli".to_string()) {
-        cli::run_cli();
-        return Ok(());
+    #[test]
+    fn test_scan_port_invalid_ip() {
+        let result = scan_port("invalid_ip", 80, Duration::from_millis(100));
+        assert!(result.is_none());
     }
-    
-    // Sinon, lancer l'interface graphique
-    cli::print_banner();
-    println!("🚀 PortHunter - Interface Graphique");
-    println!("💡 Utilisez --cli pour l'interface en ligne de commande");
-    println!("====================================");
 
-    let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1200.0, 800.0])
-            .with_min_inner_size([800.0, 600.0]),
-        ..Default::default()
-    };
-
-    eframe::run_native(
-        "PortHunter",
-        options,
-        Box::new(|cc| Box::new(PortHunterApp::new(cc))),
-    )?;
-    
-    Ok(())
+    #[test]
+    fn test_scan_port_closed() {
+        // Test avec un port probablement fermé
+        let result = scan_port("127.0.0.1", 9999, Duration::from_millis(100));
+        assert!(result.is_none());
+    }
 }
-
-// Makefile - Mis à jour
-/*
-.PHONY: build run test clean install
-
-# Variables
-CARGO_FLAGS := --release
-TARGET_DIR := target/release
-
-# Build l'application
-build:
-	cargo build $(CARGO_FLAGS)
-
-# Exécuter en mode GUI (par défaut)
-run:
-	cargo run $(CARGO_FLAGS)
-
-# Exécuter en mode CLI
-run-cli:
-	cargo run $(
