@@ -2,7 +2,30 @@
 name = "porthunter"
 version = "0.1.0"
 edition = "2021"
+authors = ["wh0amix"]
+description = "Scanner de ports avancé avec interface graphique native"
+license = "MIT"
+repository = "https://github.com/wh0amix/PortHunter"
 
 [dependencies]
+# Dépendances pour scan de ports
+rayon = "1.7"
+dns-lookup = "2.0"
 figlet-rs = "0.1"
-rayon = "1.5"
+
+# Interface graphique
+eframe = "0.24"
+egui = "0.24"
+
+# Sérialisation pour export
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[features]
+default = ["gui"]
+gui = []
+cli = []
+
+[[bin]]
+name = "porthunter"
+path = "src/main.rs"
