@@ -7,13 +7,6 @@
 [![GitHub stars](https://img.shields.io/github/stars/wh0amix/PortHunter?style=for-the-badge)](https://github.com/wh0amix/PortHunter/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/wh0amix/PortHunter?style=for-the-badge)](https://github.com/wh0amix/PortHunter/issues)
 
-<div align="center">
-
-![PortHunter Demo](https://via.placeholder.com/800x400/1a1a2e/eee?text=PortHunter+GUI+Demo)
-
-*Interface graphique moderne avec scan en temps réel*
-
-</div>
 
 ---
 
